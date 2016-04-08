@@ -14,6 +14,7 @@
 		A52427911CB7EA10000C1800 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A524278F1CB7EA10000C1800 /* LaunchScreen.storyboard */; };
 		A524279C1CB7EA10000C1800 /* ToDoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A524279B1CB7EA10000C1800 /* ToDoTests.swift */; };
 		A52427A71CB7EA10000C1800 /* ToDoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A52427A61CB7EA10000C1800 /* ToDoUITests.swift */; };
+		A52427B51CB7EFF1000C1800 /* CustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A52427B41CB7EFF1000C1800 /* CustomCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 		A52427A21CB7EA10000C1800 /* ToDoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ToDoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A52427A61CB7EA10000C1800 /* ToDoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoUITests.swift; sourceTree = "<group>"; };
 		A52427A81CB7EA10000C1800 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A52427B41CB7EFF1000C1800 /* CustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +101,7 @@
 			children = (
 				A52427861CB7EA10000C1800 /* AppDelegate.swift */,
 				A52427881CB7EA10000C1800 /* ViewController.swift */,
+				A52427B41CB7EFF1000C1800 /* CustomCell.swift */,
 				A524278A1CB7EA10000C1800 /* Main.storyboard */,
 				A524278D1CB7EA10000C1800 /* Assets.xcassets */,
 				A524278F1CB7EA10000C1800 /* LaunchScreen.storyboard */,
@@ -260,6 +263,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A52427891CB7EA10000C1800 /* ViewController.swift in Sources */,
+				A52427B51CB7EFF1000C1800 /* CustomCell.swift in Sources */,
 				A52427871CB7EA10000C1800 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
