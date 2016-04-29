@@ -5,6 +5,7 @@
 //  Created by Maarten Brijker on 08/04/16.
 //  Copyright © 2016 Maarten_Brijker. All rights reserved.
 //
+///////////////////////////////////////////////////////////////
 
 import UIKit
 import SQLite
@@ -12,38 +13,33 @@ import SQLite
 class ViewController: UIViewController {
     
     var stuff = [String] ()
-    //var newToDo = ""
     
     // SQLite Database:
     var database: Connection?
-    let dontforget = Table("dontforget")
+    let dontforgets = Table("dontforgets")
     let id = Expression<Int64>("id")
     let todo = Expression<String>("todo")
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var addTextField: UITextField!
 
-    // INSERT INTO "dontforget" ("todo") VALUES ('buy groceries').
+    // INSERT INTO "dontforgets" ("todo") VALUES ('buy groceries').
     @IBAction func addButton(sender: AnyObject) {
        
-        let insert = dontforget.insert(todo <- addTextField.text!)
+        let someToDo = addTextField.text!
         
         do {
-            let rowId = try database!.run(insert)
-            print(rowId)
-            print(insert)
+            if someToDo != "" {
+                let insert = dontforgets.insert(todo <- someToDo)
+                let rowId = try database!.run(insert)
+                // Update To Do list to be displayed.
+                displayToDoList()
+            }
         }
-        catch{
+        catch {
             // Error handling here.
             print("Error creating todo: \(error)")
         }
-        
-        
-        // add new 'to do' text
-        //newToDo = addTextField.text!
-        //stuff.append(newToDo)
-        //self.tableView.reloadData()
-        //print(stuff)
     }
     
     override func viewDidLoad() {
@@ -51,6 +47,8 @@ class ViewController: UIViewController {
         
         // Setup database.
         setupDatabase()
+        displayToDoList()
+        tableView.reloadData()
     }
 
     override func didReceiveMemoryWarning() {
@@ -66,7 +64,6 @@ class ViewController: UIViewController {
             database = try Connection("\(path)/db.sqlite3")
             createTable()
         }
-            
         catch {
             // Error handling here.
             print("Cannot connect to database: \(error)")
@@ -77,10 +74,9 @@ class ViewController: UIViewController {
     private func createTable(){
         
         do {
-            try database!.run(dontforget.create(ifNotExists: true) { t in    // CREATE TABLE: "dontforget"
-            
-                t.column(id, primaryKey: .Autoincrement)                // "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                t.column(todo, unique: true)                            // "todo" TEXT UNIQUE NOT NULL,
+            try database!.run(dontforgets.create(ifNotExists: true) { t in   // CREATE TABLE: "dontforgets"
+                t.column(id, primaryKey: .Autoincrement)                    // "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                t.column(todo, unique: true)                                // "todo" TEXT UNIQUE NOT NULL,
             })
         }
         catch {
@@ -88,8 +84,27 @@ class ViewController: UIViewController {
             print("Failed to create table: \(error)")
         }
     }
-}
     
+    // Loops over the database, puts all in a string so table can display them.
+    private func displayToDoList() {
+
+        do {
+            stuff = []
+            for dontforget in try database!.prepare(dontforgets.select(todo)) {
+                let todoValue = dontforget[todo]
+                stuff.append(todoValue)
+            }
+            //print(stuff)
+            tableView.reloadData()
+        }
+        catch {
+            // Error handling here.
+            print("Failed to find todo: \(error)")
+        }
+    }
+    
+}
+
 extension ViewController: UITableViewDataSource {
 
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
