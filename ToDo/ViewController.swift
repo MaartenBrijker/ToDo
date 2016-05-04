@@ -13,7 +13,7 @@ import SQLite
 class ViewController: UIViewController {
     
     // List to hold "todo's" so tableview can display them.
-    var stuff = [String] ()
+    var stuff = [Int: String] ()
     
     // Variable to index which item to delete.
     var deleteId: Int?
@@ -32,7 +32,6 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
         setupDatabase()
         displayToDoList()
         tableView.reloadData()
@@ -42,7 +41,7 @@ class ViewController: UIViewController {
         super.didReceiveMemoryWarning()
     }
     
-    // My personal color scheme.
+    /// My personal color scheme.
     func colorCells(index: Int) -> UIColor {
         let itemCount = stuff.count - 1
         let degradingValue = (CGFloat(index) / CGFloat(itemCount)) * 0.8
@@ -59,7 +58,7 @@ class ViewController: UIViewController {
         do {
             if someToDo != "" {
                 let insert = dontforgets.insert(todo <- someToDo)
-                let rowId = try database!.run(insert)
+                try database!.run(insert)
                 
                 // Update To Do list to be displayed.
                 displayToDoList()
@@ -69,11 +68,10 @@ class ViewController: UIViewController {
             }
         }
         catch {
-            // Error handling here.
             print("Error creating todo: \(error)")
         }
     }
-       
+    
     private func setupDatabase() {
         let path = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true).first!
         
@@ -83,7 +81,6 @@ class ViewController: UIViewController {
             createTable()
         }
         catch {
-            // Error handling here.
             print("Cannot connect to database: \(error)")
         }
     }
@@ -97,25 +94,25 @@ class ViewController: UIViewController {
             })
         }
         catch {
-            // Error handling here.
             print("Failed to create table: \(error)")
         }
     }
     
-    // Loops over the database, puts 'id' and 'todo' in a dictionary so table can display them.
+    /// Loops over the database, puts 'id' and 'todo' in a dictionary so we can display and access values.
     private func displayToDoList() {
 
         do {
-            stuff = []
-            for dontforget in try database!.prepare(dontforgets.select(todo)) {
+            stuff = [:]
+            for dontforget in try database!.prepare(dontforgets.select(id, todo)) {
+                let todoKey = dontforget[id]
                 let todoValue = dontforget[todo]
-                
-                stuff.append(todoValue)
+                stuff[todoKey] = todoValue
             }
+            print(stuff)
+            
             tableView.reloadData()
         }
         catch {
-            // Error handling here.
             print("Failed to find todo: \(error)")
         }
     }
@@ -137,7 +134,6 @@ class ViewController: UIViewController {
             displayToDoList()
         }
         catch {
-            // Error handling here.
             print("delete failed: \(error)")
         }
     }
@@ -154,7 +150,8 @@ extension ViewController: UITableViewDataSource {
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = self.tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! CustomCell
-        cell.toDoLabel.text = self.stuff[indexPath.row]
+        let values = Array(stuff)
+        cell.toDoLabel.text = values[indexPath.row].1
         
         // Delete selection style.
         cell.selectionStyle = .None
@@ -162,16 +159,17 @@ extension ViewController: UITableViewDataSource {
         return cell
     }
     
-    // Set color of rows.
+    /// Set color of rows.
     func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
         cell.backgroundColor = colorCells(indexPath.row)
     }
     
-    // Delete rows.
+    /// Delete rows.
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         
-        // Get row number.
-        deleteId = indexPath.row
+        // Get row id.
+        let values = Array(stuff)
+        deleteId = values[indexPath.row].0
         
         deleteRowFromDatabase()
     }
