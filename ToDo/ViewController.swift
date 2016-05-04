@@ -15,10 +15,10 @@ class ViewController: UIViewController {
     // List to hold "todo's" so tableview can display them.
     var stuff = [String] ()
     
-    // deleteId
+    // Variable to index which item to delete.
     var deleteId: Int?
     
-    // SQLite Database:
+    // Initiating the SQLite Database.
     var database: Connection?
     let dontforgets = Table("dontforgets")
     let id = Expression<Int>("id")          // this was first of type <Int64> ...
@@ -28,23 +28,21 @@ class ViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var addTextField: UITextField!
     
-// MARK: - Basic app life cycle things.
+// MARK: - Basic app life cycle and table functions.
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Setup database.
+
         setupDatabase()
         displayToDoList()
         tableView.reloadData()
-        
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
+    // My personal color scheme.
     func colorCells(index: Int) -> UIColor {
         let itemCount = stuff.count - 1
         let degradingValue = (CGFloat(index) / CGFloat(itemCount)) * 0.8
@@ -104,16 +102,16 @@ class ViewController: UIViewController {
         }
     }
     
-    // Loops over the database, puts all in a string so table can display them.
+    // Loops over the database, puts 'id' and 'todo' in a dictionary so table can display them.
     private func displayToDoList() {
 
         do {
             stuff = []
             for dontforget in try database!.prepare(dontforgets.select(todo)) {
                 let todoValue = dontforget[todo]
+                
                 stuff.append(todoValue)
             }
-            //print(stuff)
             tableView.reloadData()
         }
         catch {
@@ -122,33 +120,27 @@ class ViewController: UIViewController {
         }
     }
     
-    /// delete later ///
-    func printfunction() {
-        print("workx5")
-    }
-    
 // MARK: - Deleting row from the database.
     
     func deleteRowFromDatabase() {
         
         let toDelete = dontforgets.filter(id == deleteId!)
-//        let toDelete = dontforgets
-        
-        print(toDelete)
         
         do {
             // DELETE FROM "users" WHERE ("id" = 1)
             if try database!.run(toDelete.delete()) > 0 {
                 print("deleted!")
             }
+            else {
+                print("row not found")
+            }
             displayToDoList()
         }
         catch {
             // Error handling here.
-            print("wasnt able to delete row as: \(error)")
+            print("delete failed: \(error)")
         }
     }
-    
 }
 
 // MARK: - the UITableview.
@@ -175,37 +167,12 @@ extension ViewController: UITableViewDataSource {
         cell.backgroundColor = colorCells(indexPath.row)
     }
     
-    // Delete rows
+    // Delete rows.
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-
-        // Remove the row from data model
-//        if editingStyle == UITableViewCellEditingStyle.Delete {
-//            stuff.removeAtIndex(indexPath.row)
-//            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Automatic)
-//        }
-
+        
         // Get row number.
         deleteId = indexPath.row
         
         deleteRowFromDatabase()
     }
-    
-
 }
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
