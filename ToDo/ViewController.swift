@@ -108,8 +108,6 @@ class ViewController: UIViewController {
                 let todoValue = dontforget[todo]
                 stuff[todoKey] = todoValue
             }
-            print(stuff)
-            
             tableView.reloadData()
         }
         catch {
@@ -152,10 +150,7 @@ extension ViewController: UITableViewDataSource {
         let cell = self.tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! CustomCell
         let values = Array(stuff)
         cell.toDoLabel.text = values[indexPath.row].1
-        
-        // Delete selection style.
         cell.selectionStyle = .None
-        
         return cell
     }
     
